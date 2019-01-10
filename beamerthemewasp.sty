@@ -1,0 +1,184 @@
+\ProvidesPackage{beamerthemewasp}[2016/11/22]
+\RequirePackage{tikz,pgf}
+\RequirePackage[overload]{textcase}
+\RequirePackage{setspace}
+%\usepackage[urw-garamond]{mathdesign}
+\usepackage[scaled]{helvet}
+\usetikzlibrary{shapes,arrows,calc}
+
+\definecolor{pink}{RGB}{203,166,169} 
+\definecolor{waspgrey}{RGB}{88,89,91}
+\definecolor{waspblue}{RGB}{26,141,173}
+
+\newcommand{\titlecolor}[1]{\renewcommand{\giventitlecolor}{#1}}
+\newcommand{\titleimage}[1]{\renewcommand{\giventitleimage}{#1}}
+\newcommand{\giventitlecolor}{}
+\newcommand{\giventitleimage}{}
+
+\defbeamertemplate{block begin}{notitle}
+{
+  \usebeamerfont{block body}%
+  \begin{beamercolorbox}[colsep*=.75ex,vmode]{block body}%
+    \ifbeamercolorempty[bg]{block body}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+}
+\newcommand{\noblocktitles}{\setbeamertemplate{block begin}[notitle]}
+\newcommand{\blocktitles}{\setbeamertemplate{block begin}[title]}
+
+%Babel support
+\providecommand*{\lulogo}{lulogo-en.pdf}
+\providecommand*{\chlogo}{chalmers.png}
+\providecommand*{\ktlogo}{kth.jpg}
+\providecommand*{\lilogo}{linkoping.png}
+\providecommand*{\umlogo}{ume.png}
+\providecommand*{\wasplogogrey}{wasp_logo_grey.pdf}
+\providecommand*{\wasplogowhite}{wasp_logo_white.pdf}
+\AtBeginDocument{
+  \@ifpackagewith{babel}{swedish}{%
+    \addto\captionsswedish{\renewcommand*\lulogo{lulogo-sv.pdf}}%
+  }{}
+  \@ifpackagewith{babel}{english}{%
+    \addto\captionsenglish{\renewcommand*\lulogo{lulogo-en.pdf}}%
+  }{} 
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Outer theme
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\useoutertheme{infolines}
+
+\pgfdeclareimage[interpolate=true,height=0.046\paperheight]{small-logo}{\wasplogowhite}
+\setbeamertemplate{footline}{%
+\begin{pgfpicture}
+\pgfsetcolor{waspblue}
+\pgfrect[fill]{\pgfpoint{0cm}{0.105\paperheight}}{\pgfpoint{\paperwidth}{0.005\paperheight}}
+\pgfsetcolor{waspgrey}
+\pgfrect[fill]{\pgfpoint{0cm}{0cm}}{\pgfpoint{\paperwidth}{0.1\paperheight}}
+\begin{pgftranslate}{\pgfpoint{0.98\paperwidth}{0.025\paperheight}}
+	\pgfbox[right,base]{\pgfuseimage{small-logo}}
+\end{pgftranslate}
+\end{pgfpicture}%
+}
+
+\setbeamertemplate{headline}{}
+
+\setbeamertemplate{title page}{
+
+\begin{tikzpicture}%[overlay]
+
+\ifx\giventitlecolor\@empty %check if there is a bg color set
+	\draw[fill=pink, line width=.3cm, draw=white, use as bounding box] (0,0)
+	rectangle (\paperwidth, 1\paperheight);
+\else
+	\draw[fill=\giventitlecolor, line width=.3cm, draw=white, use as bounding box] (0,0)
+	rectangle (\paperwidth, 1\paperheight);
+\fi
+	
+\ifx\giventitleimage\@empty
+	%if no title image do nothing
+\else
+	\begin{scope}
+		\clip (.15, .15) rectangle ($(\paperwidth,\paperheight) - (-0.005\paperwidth, .15)$);
+		\node[inner sep=0, anchor=south west] at (.15,.15) {\giventitleimage};
+	\end{scope}
+\fi
+
+\usebeamerfont{title} %set font to title font
+\renewcommand{\baselinestretch}{.9} %reduce line spacing
+
+%draw white title box
+\node[draw=waspblue, anchor=west, shape=rectangle,minimum height=2cm, align=left, fill=waspblue, font=\Large, inner ysep=.5cm]
+ at (0.03\paperwidth, .86\paperheight) (titlenode) {\inserttitle}; 
+
+%draw more white boxes
+\draw[fill=waspblue,draw=none] 
+($(titlenode.south east)+(-.1cm,0)$) rectangle ($(titlenode.north east)+(\paperwidth,0)$);
+\draw[fill=waspblue,draw=none] 
+($(titlenode.south west)+(0,.1cm)$) rectangle ($(titlenode.south east)+(\paperwidth,-0.2cm)$);
+    \addtobeamertemplate{frametitle}{\vspace*{-1.4cm}}{\vspace*{0.2cm}}
+%draw the line to the edge of the page
+\begin{scope}
+\clip (.15, .15) rectangle ($(\paperwidth,1\paperheight) - (-0.005\paperwidth, .15)$);
+\draw[very thick, draw=white] ($(titlenode.text)+(0,-.19cm)$) -- ($(titlenode.text)+(\paperwidth,-.19cm)$);
+\end{scope}
+
+%draw subtitle if there is one
+\ifx\insertsubtitle\@empty
+      %if there is no subtitle dont draw anything
+    \else
+    	 %draw subtitle and boxes
+     \draw[fill=white,draw=none]
+     ($(titlenode.south west)+(0,-0.1cm)$) rectangle ($(titlenode.south east)+(\paperwidth,-0.5cm)$);
+     \usebeamerfont{subtitle}   
+     \node[align=left, anchor=text, draw=none,font=\footnotesize] at ($(titlenode.text)+(0,-.56cm)$)
+     {\MakeUppercase{\insertsubtitle}};
+\fi
+
+%draw logos
+\node at ($(0.5\paperwidth,0.5\paperheight)$) {\includegraphics[height=0.13\paperheight]{\wasplogogrey}};
+\node at ($(0.1\paperwidth,0.15\paperheight)$) {\includegraphics[height=0.15\paperheight]{\chlogo}};
+\node at ($(0.3\paperwidth,0.15\paperheight)$) {\includegraphics[height=0.15\paperheight]{\ktlogo}};
+\node at ($(0.5\paperwidth,0.15\paperheight)$) {\includegraphics[height=0.15\paperheight]{\lilogo}};
+\node at ($(0.7\paperwidth,0.15\paperheight)$) {\includegraphics[height=0.15\paperheight]{\lulogo}};
+\node at ($(0.9\paperwidth,0.15\paperheight)$) {\includegraphics[height=0.15\paperheight]{\umlogo}};
+\end{tikzpicture}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Inner Theme
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\useinnertheme{circles}
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamersize{text margin left=1cm ,text margin right=1cm}
+%\setlength{\leftmargini}{1.5em}
+%\setlength{\leftmarginii}{1.0em}
+%\setlength{\leftmarginiii}{1.5em}
+%\setlength{\leftmarginiv}{2.0em}
+%\setlength{\leftmarginv}{2.5em}
+%\setlength{\leftmarginvi}{3.0em}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Colours
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usefonttheme{structurebold}
+\usecolortheme[named=waspgrey]{structure}
+\usecolortheme{rose}
+\setbeamercolor{title page}{fg=white}
+\setbeamercolor{logo}{bg=waspgrey}
+\setbeamercolor{frametitle}{fg=waspgrey,bg=white}
+\setbeamercolor{section in sidebar}{fg=waspgrey}
+\setbeamerfont{section in sidebar}{series=\bfseries}
+\setbeamercolor{block title}{bg=white,fg=waspgrey}
+\setbeamercolor{block body}{bg=white!50!white}
+\setbeamercolor{block title alert}{bg=pink,fg=waspgrey}
+\setbeamercolor{block body alert}{bg=pink!50!white}
+\setbeamercolor{block title example}{bg=pink,fg=waspgrey}
+\setbeamercolor{block body example}{bg=pink!50!white}
+\setbeamerfont{title}{family={\sffamily}, series={\bfseries}}
+\setbeamerfont{subtitle}{family={\sffamily},series={\bfseries}}
+\setbeamerfont{frametitle}{family={\sffamily},series={\bfseries}}
+\setbeamerfont{block title}{family={\sffamily},series={\bfseries}}
+
+\newcommand{\titleframe}{
+\begingroup
+\makeatletter
+\setlength{\hoffset}{-\Gm@lmargin}
+\makeatother
+\begin{frame}[plain,shrink]
+    \titlepage
+\end{frame}
+\endgroup
+}
+
+\newcommand\ThankYouFrame{
+\begin{frame}[plain,t]
+\begin{pgfpicture}
+\pgf@relevantforpicturesizefalse
+\pgftransformxshift{-\Gm@lmargin}
+\pgftransformyshift{5.5pt}
+\DoPurpleBackground
+\end{pgfpicture}
+\end{frame}
+}
+    
